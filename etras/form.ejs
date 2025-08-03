@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forms</title>
+  </head>
+  <body>
+    <h2>Forms</h2>
+    <!-- College form -->
+    <h3>College form</h3>
+    <form action="/college" method="POST">
+      <input type="text" name="name" placeholder="Name" required />
+      <input type="text" name="location" placeholder="Address" required />
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- Department form -->
+    <h3>Department form</h3>
+    <form action="/department" method="POST">
+      <input type="text" name="name" placeholder="Name" required />
+      <input type="text" name="collegeId" placeholder="College ID" required />
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- Class form -->
+    <h3>Class form</h3>
+    <form action="/class" method="POST">
+      <input type="text" name="name" placeholder="Name" required />
+      <input
+        type="text"
+        name="departmentId"
+        placeholder="Department ID"
+        required
+      />
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- Subject Form -->
+    <h3>Subject form</h3>
+    <form action="/subject" method="POST">
+      <input type="text" name="name" placeholder="Name" required />
+      <input type="text" name="classId" placeholder="Class ID" required />
+      <input type="text" name="type" placeholder="Type" required />
+      <input
+        type="text"
+        name="teachingProfId"
+        placeholder="Teacher ID"
+        required
+      />
+
+      <button type="submit">Submit</button>
+    </form>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>All Colleges</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow">
+      <h2 class="text-2xl font-bold mb-6">Colleges</h2>
+
+      <a
+        href="/admin/college/create"
+        class="inline-block mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >+ Add College</a
+      >
+
+      <% if (colleges.length === 0) { %>
+      <p>No colleges found.</p>
+      <% } else { %>
+      <ul class="space-y-4">
+        <% colleges.forEach(college => { %>
+        <li class="border p-4 rounded shadow-sm bg-gray-50">
+          <h3 class="text-lg font-semibold"><%= college.name %></h3>
+          <p class="text-sm text-gray-600">Location: <%= college.location %></p>
+          <a
+            href="/admin/department/create/<%= college._id %>"
+            class="mt-2 inline-block text-blue-600 hover:underline"
+            >+ Add Department</a
+          >
+          <a
+            href="/admin/college/<%= college._id %>/departments"
+            class="ml-4 text-blue-600 hover:underline"
+            >View Departments</a
+          >
+        </li>
+        <% }); %>
+      </ul>
+      <% } %>
+    </div>
+  </body>
+</html>

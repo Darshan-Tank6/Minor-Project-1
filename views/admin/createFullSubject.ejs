@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Subject</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 p-8">
+    <div class="max-w-xl mx-auto bg-white p-6 rounded-2xl shadow">
+      <h2 class="text-2xl font-bold mb-4">
+        Create Subject for <%= cls.name %>
+      </h2>
+
+      <form
+        method="POST"
+        action="/admin/class/<%= cls._id %>/subject/create"
+        class="space-y-4"
+      >
+        <input
+          type="text"
+          name="name"
+          placeholder="Subject Name"
+          required
+          class="w-full p-2 border rounded"
+        />
+
+        <select name="type" required class="w-full p-2 border rounded">
+          <option value="">Select Type</option>
+          <option value="theory">Theory</option>
+          <option value="lab">Lab</option>
+        </select>
+
+        <select
+          name="teachingProfId"
+          required
+          class="w-full p-2 border rounded"
+        >
+          <option value="">Select Teaching Professor</option>
+          <% teachers.forEach(t => { %>
+          <option value="<%= t._id %>"><%= t.name %></option>
+          <% }) %>
+        </select>
+
+        <select name="assistantProfId" class="w-full p-2 border rounded">
+          <option value="">Select Assistant Professor (optional)</option>
+          <% teachers.forEach(t => { %>
+          <option value="<%= t._id %>"><%= t.name %></option>
+          <% }) %>
+        </select>
+
+        <h3 class="text-lg font-semibold mt-4">Schedules</h3>
+
+        <div id="scheduleContainer">
+          <div
+            class="schedule-group mb-4 space-y-2 border p-3 rounded relative bg-gray-50"
+          >
+            <button
+              type="button"
+              onclick="this.parentElement.remove()"
+              class="absolute top-2 right-2 text-red-600 hover:text-red-800"
+            >
+              🗑
+            </button>
+            <select name="day" required class="w-full p-2 border rounded">
+              <option value="">Day</option>
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option>Saturday</option>
+            </select>
+            <input
+              type="time"
+              name="startTime"
+              required
+              class="w-full p-2 border rounded"
+            />
+            <input
+              type="time"
+              name="endTime"
+              required
+              class="w-full p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="room"
+              placeholder="Room"
+              required
+              class="w-full p-2 border rounded"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onclick="addSchedule()"
+          class="bg-green-500 text-white px-4 py-2 rounded"
+        >
+          + Add Another Time Slot
+        </button>
+
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Create Subject
+        </button>
+      </form>
+
+      <a
+        href="/admin/department/<%= cls.departmentId._id %>/classes"
+        class="inline-block mt-4 text-gray-600 hover:underline"
+      >
+        ← Back to Classes
+      </a>
+    </div>
+  </body>
+  <script>
+    function addSchedule() {
+      const container = document.getElementById("scheduleContainer");
+      const group = document.createElement("div");
+      group.className =
+        "schedule-group mb-4 space-y-2 border p-3 rounded relative bg-gray-50";
+      group.innerHTML = `
+      <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-600 hover:text-red-800">
+        🗑
+      </button>
+      <select name="day" required class="w-full p-2 border rounded">
+        <option value="">Day</option>
+        <option>Monday</option>
+        <option>Tuesday</option>
+        <option>Wednesday</option>
+        <option>Thursday</option>
+        <option>Friday</option>
+        <option>Saturday</option>
+      </select>
+      <input type="time" name="startTime" required class="w-full p-2 border rounded" />
+      <input type="time" name="endTime" required class="w-full p-2 border rounded" />
+      <input type="text" name="room" placeholder="Room" required class="w-full p-2 border rounded" />
+    `;
+      container.appendChild(group);
+    }
+  </script>
+</html>

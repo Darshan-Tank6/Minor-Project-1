@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+  </head>
+  <body>
+    <% if (success_msg && success_msg.length > 0) { %>
+    <div class="custom-alert-success"><%= success_msg %></div>
+    <% } %> <% if(error_msg && error_msg.length >0) { %>
+    <div class="custom-alert"><%= error_msg %></div>
+    <%}%> <% if(error && error.length > 0) { %>
+    <div class="custom-alert"><%= error_msg %></div>
+    <% }%>
+
+    <h1>Login</h1>
+    <form action="/auth/login" method="POST">
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Submit</button>
+    </form>
+  </body>
+</html>

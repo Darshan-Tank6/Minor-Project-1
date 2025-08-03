@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Teachers in <%= department.name %></title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow">
+      <h2 class="text-2xl font-bold mb-4">
+        Teachers in <%= department.name %> (<%= department.collegeId.name %>)
+      </h2>
+
+      <% if (teachers.length === 0) { %>
+      <p>No Teachers found.</p>
+      <% } else { %>
+      <ul class="space-y-4">
+        <% teachers.forEach(tchr => { %>
+        <li class="border p-4 rounded shadow-sm bg-gray-50">
+          <h3 class="text-lg font-semibold"><%= tchr.name %></h3>
+          <p class="text-sm text-gray-600">
+            Department: <%= tchr.departmentId.name %>
+          </p>
+
+          <!-- <p class="text-sm text-gray-600">
+            Assigned Subjects: <%= tchr.assignedSubjects.name %>
+          </p> -->
+          <p class="text-sm text-gray-600">
+            Assigned Subjects: <% if (tchr.assignedSubjects.length > 0) { %> <%
+            tchr.assignedSubjects.forEach(function(subject, index) { %> <%=
+            subject.name %><%= index < tchr.assignedSubjects.length - 1 ? ', ' :
+            '' %> <% }) %> <% } else { %> None <% } %>
+          </p>
+
+          <!-- <a
+            href="/admin/class/<%= tchr._id %>/subject/create"
+            class="text-blue-600 hover:underline"
+            >+ Add Subject</a
+          > -->
+        </li>
+        <% }); %>
+      </ul>
+      <% } %>
+
+      <a
+        href="/admin/college/<%= department.collegeId._id %>/departments"
+        class="inline-block mt-6 text-gray-600 hover:underline"
+        >← Back to Departments</a
+      >
+    </div>
+  </body>
+</html>
