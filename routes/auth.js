@@ -7,6 +7,7 @@ const moment = require("moment");
 const { ensureAuthenticated, checkRole } = require("../middleware/auth");
 const Student = require("../models/Student");
 const Teacher = require("../models/Teacher");
+const { userInfo } = require("os");
 
 // Show Register Page
 router.get("/register", (req, res) => {
@@ -29,25 +30,39 @@ router.post("/register", async (req, res) => {
       return res.status(400).send("User already exists");
     }
 
+    // if (role === "teacher") {
+    //   const newTeacher = new Teacher({
+    //     email: email,
+    //     userId: newUser._id,
+    //   });
+    //   await newTeacher.save();
+    // }
+
+    // if (role === "student") {
+    //   const newStudent = new Student({
+    //     email: email,
+    //     userId: newUser._id,
+    //   });
+    //   await newStudent.save();
+    // }
+    const teacher = await Teacher.findOne({ email });
+    const newUser = new User({ email, passwordHash: password });
+
+    if (teacher) {
+      newUser.role = "teacher";
+      await newUser.save();
+      teacher.userId = newUser._id;
+      await teacher.save();
+    } else {
+      newUser.role = role;
+      await newUser.save();
+      if (role === "student") {
+        const newStudent = new Student({ userId: newUser._id });
+        await newStudent.save();
+      }
+    }
+
     // Create new user
-    const newUser = new User({ email, passwordHash: password, role });
-    await newUser.save();
-
-    if (role === "teacher") {
-      const newTeacher = new Teacher({
-        email: email,
-        userId: newUser._id,
-      });
-      await newTeacher.save();
-    }
-
-    if (role === "student") {
-      const newStudent = new Student({
-        email: email,
-        userId: newUser._id,
-      });
-      await newStudent.save();
-    }
 
     req.flash("success_msg", "Registration successful! You can now log in.");
     res.redirect("/auth/login");

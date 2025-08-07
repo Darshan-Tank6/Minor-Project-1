@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <head>
+      <title>Add - College - Details</title>
+      <link
+        href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+        rel="stylesheet"
+      />
+    </head>
+  </head>
+  <body class="bg-gray-100 p-8">
+    <form action="/student/add-college-details" method="post">
+      <% if (colleges.length === 0) { %>
+      <p>No colleges found.</p>
+      <% } else { %>
+      <select name="college" class="space-y-4">
+        <% colleges.forEach(college => { %>
+        <option
+          class="border p-4 rounded shadow-sm bg-gray-50"
+          value="<%= college._id %>"
+        >
+          <h3 class="text-lg font-semibold"><%= college.name %></h3>
+          <p class="text-sm text-gray-600">Location: <%= college.location %></p>
+        </option>
+        <% }); %>
+      </select>
+      <% } %> <% if(departments.lenght === 0) { %>
+      <p>No Departments Found.</p>
+      <%} else { %>
+      <select name="department">
+        <% departments.forEach(department => { %>
+        <option value="<%= department._id %>"><%= department.name %></option>
+        <%})%>
+      </select>
+      <%}%> <% if(classes.lenght === 0) { %>
+      <p>No Departments Found.</p>
+      <%} else { %>
+      <select name="class">
+        <% classes.forEach(classe => { %>
+        <option value="<%= classe._id %>"><%= classe.name %></option>
+        <%})%>
+      </select>
+      <%}%>
+    </form>
+  </body>
+</html>

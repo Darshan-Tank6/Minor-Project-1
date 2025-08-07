@@ -22,7 +22,8 @@ require("./config/passport"); // Load Passport strategy
 // Import Routes
 // const tipsRoutes = require("./routes/tips");
 const authRoutes = require("./routes/auth");
-// const reportRoutes = require("./routes/report");
+const teacherRoutes = require("./routes/teacher");
+const studentRoutes = require("./routes/student");
 const adminRoutes = require("./routes/admin");
 
 const app = express();
@@ -99,8 +100,8 @@ app.use((req, res, next) => {
 
 // 📌 Routes
 app.use("/auth", authRoutes);
-// app.use("/tips", tipsRoutes);
-// app.use("/reports", reportRoutes);
+app.use("/teacher", teacherRoutes);
+app.use("/student", studentRoutes);
 app.use("/admin", adminRoutes);
 
 // 📌 Home Route

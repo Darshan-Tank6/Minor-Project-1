@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Classes</title>
+  </head>
+  <body>
+    <% if(!teacher) {%>
+    <p>No Teacher found</p>
+    <%} else {%>
+    <p>Name: <%= teacher.name %></p>
+    <p>Email: <%= teacher.email %></p>
+    <p>Department: <%= teacher.departmentId.name %></p>
+    <% if(teacher.assignedSubjects.length > 0 && teacher.assignedSubjects ){ %>
+    <% teacher.assignedSubjects.forEach(subject => {%>
+    <p>Sub name: <%=subject.name%></p>
+    <%})%> <%}%> <%}%>
+  </body>
+</html>

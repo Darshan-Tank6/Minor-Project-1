@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Student Form</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <h2>Select College, Department, and Class</h2>
+    <p>Welcome <%= user.email %></p>
+    <form action="/student/submit-student-form" method="POST">
+      <label for="college">College:</label>
+      <select id="college" name="college" required>
+        <option value="">Select College</option>
+        <% colleges.forEach(college => { %>
+        <option value="<%= college._id %>"><%= college.name %></option>
+        <% }) %>
+      </select>
+
+      <br /><br />
+
+      <label for="department">Department:</label>
+      <select id="department" name="department" required>
+        <option value="">Select Department</option>
+      </select>
+
+      <br /><br />
+
+      <label for="class">Class:</label>
+      <select id="class" name="classid" required>
+        <option value="">Select Class</option>
+      </select>
+
+      <br /><br />
+      <label for="name">Name: </label>
+      <input type="text" name="name" required />
+
+      <br /><br />
+      <label for="rollno">Roll NO: </label>
+      <input type="number" name="rollno" required />
+
+      <br /><br />
+      <button type="submit">Submit</button>
+    </form>
+
+    <script>
+      $("#college").on("change", function () {
+        const collegeId = $(this).val();
+        $("#department").html('<option value="">Loading...</option>');
+        $("#class").html('<option value="">Select Class</option>');
+
+        if (collegeId) {
+          $.get(`/student/departments/${collegeId}`, function (departments) {
+            let options = '<option value="">Select Department</option>';
+            departments.forEach((dep) => {
+              options += `<option value="${dep._id}">${dep.name}</option>`;
+            });
+            $("#department").html(options);
+          });
+        }
+      });
+
+      $("#department").on("change", function () {
+        const deptId = $(this).val();
+        $("#class").html('<option value="">Loading...</option>');
+
+        if (deptId) {
+          $.get(`/student/classes/${deptId}`, function (classes) {
+            let options = '<option value="">Select Class</option>';
+            classes.forEach((cls) => {
+              options += `<option value="${cls._id}">${cls.name}</option>`;
+            });
+            $("#class").html(options);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

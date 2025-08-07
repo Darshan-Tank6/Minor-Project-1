@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 
 const studentSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    rollNumber: { type: String, required: true, unique: true },
+    name: { type: String, required: false },
+    rollNumber: { type: String, required: false, unique: true },
     classId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Class",
-      required: true,
+      required: false,
     },
     departmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Department" },
     year: Number,
