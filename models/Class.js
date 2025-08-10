@@ -9,6 +9,12 @@ const classSchema = new mongoose.Schema(
       required: true,
     },
     year: { type: Number, required: true },
+    subjects: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Subject",
+      },
+    ],
     // college: { type: mongoose.Schema.Types.ObjectId, ref: "College" },
   },
   { timestamps: true }

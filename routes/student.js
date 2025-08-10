@@ -73,4 +73,35 @@ router.post("/submit-student-form", async (req, res) => {
   }
 });
 
+// View Profile
+router.get("/view-profile", async (req, res) => {
+  try {
+    const student = await Student.findOne({ userId: req.user._id })
+      .populate("classId")
+      .populate("departmentId")
+      .populate("userId")
+      .populate({
+        path: "classId",
+        populate: {
+          path: "subjects",
+          populate: [
+            { path: "teachingProfessor", select: "name email" },
+            { path: "assistantProfessor", select: "name email" },
+          ],
+        },
+      });
+
+    // .populate("collegeId");
+
+    if (!student) {
+      return res.status(404).send("Student not found");
+    }
+
+    res.render("student/viewProfile", { student });
+  } catch (error) {
+    console.error("Error fetching student profile:", error);
+    res.status(500).send("Error fetching student profile");
+  }
+});
+
 module.exports = router;

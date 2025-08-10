@@ -1,0 +1,30 @@
+View profile student: http://localhost:3000/student/view-profile 
+student college details form: http://localhost:3000/student/student-form
+
+view teacher class: http://localhost:3000/teacher/view/classes
+
+Auth login: https://localhost:3000/auth/login
+Auth register: https://localhost:3000/auth/register
+
+Add colleges admin: https://localhost:3000/admin/dashboard
+view colleges admin: http://localhost:3000/admin/colleges
+
+view department under a college: http://localhost:3000/admin/college/6891f9c0b570a5fe9498b879/departments
+                               : http://localhost:3000/admin/college/:id/departments
+
+view class under a department: http://localhost:3000/admin/department/6891f9c8b570a5fe9498b886/classes
+                             : http://localhost:3000/admin/department/:id/classes
+
+view subject under a class: http://localhost:3000/admin/subjects/under/class/6891f9e6b570a5fe9498b89a
+                          : http://localhost:3000/admin/subjects/under/class/:id
+
+add department: http://localhost:3000/admin/department/create/6891f9c0b570a5fe9498b879
+
+add class under department: http://localhost:3000/admin/class/create/6891f9c8b570a5fe9498b886
+
+add teacher under department: http://localhost:3000/admin/teacher/create/6891f9c8b570a5fe9498b886
+
+add subject under a class: http://localhost:3000/admin/class/6891f9e6b570a5fe9498b89a/subject/create
+
+add chapter under a subject: http://localhost:3000/admin/subjects/6891fabeb570a5fe9498b8fe
+
