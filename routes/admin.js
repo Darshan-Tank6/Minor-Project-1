@@ -231,6 +231,11 @@ router.post("/class/:classId/subject/create", async (req, res) => {
       chapters: [],
     });
 
+    const classExists = await Class.findById(cls._id);
+    if (!classExists) return res.status(404).send("Class not found");
+    classExists.subjects.push(subject._id);
+    await classExists.save();
+
     await subject.save();
 
     // const teacher = await Teacher.findById(teachingProfId);

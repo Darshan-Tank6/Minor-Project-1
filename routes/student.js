@@ -85,8 +85,16 @@ router.get("/view-profile", async (req, res) => {
         populate: {
           path: "subjects",
           populate: [
-            { path: "teachingProfessor", select: "name email" },
-            { path: "assistantProfessor", select: "name email" },
+            {
+              path: "teachingProfId",
+              select: "name email",
+              strictPopulate: false,
+            },
+            {
+              path: "assistantProfId",
+              select: "name email",
+              strictPopulate: false,
+            },
           ],
         },
       });

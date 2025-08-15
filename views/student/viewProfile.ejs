@@ -42,28 +42,27 @@
       <% student.classId.subjects.forEach(subject => { %>
       <div class="card mb-3">
         <div class="card-header">
-          <strong><%= subject.name %></strong> (<%= subject.code %>)
+          <strong><%= subject.name %></strong>
         </div>
         <div class="card-body">
-          <% if (subject.teachingProfessor) { %>
+          <% if (subject.teachingProfId) { %>
           <p>
-            <strong>Teaching Professor:</strong> <%=
-            subject.teachingProfessor.name %> (<%=
-            subject.teachingProfessor.email %>)
+            <strong>Teaching Professor:</strong> <%= subject.teachingProfId.name
+            %> (<%= subject.teachingProfId.email %>)
           </p>
-          <% } %> <% if (subject.assistantProfessor) { %>
+          <% } %> <% if (subject.assistantProfId) { %>
           <p>
             <strong>Assistant Professor:</strong> <%=
-            subject.assistantProfessor.name %> (<%=
-            subject.assistantProfessor.email %>)
+            subject.assistantProfId.name %> (<%= subject.assistantProfId.email
+            %>)
           </p>
           <% } %> <% if (subject.schedule && subject.schedule.length > 0) { %>
           <h6>Schedule</h6>
           <ul class="list-group mb-3">
             <% subject.schedule.forEach(slot => { %>
             <li class="list-group-item">
-              <strong><%= slot.day %>:</strong> <%= slot.from %> to <%= slot.to
-              %>
+              <strong><%= slot.day %>:</strong> <%= slot.startTime %> to <%=
+              slot.endTime %> in <%= slot.room %>
             </li>
             <% }); %>
           </ul>
