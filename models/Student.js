@@ -12,6 +12,7 @@ const studentSchema = new mongoose.Schema(
     departmentId: { type: mongoose.Schema.Types.ObjectId, ref: "Department" },
     year: Number,
     email: String,
+    division: String,
     currentLeaves: [
       { type: mongoose.Schema.Types.ObjectId, ref: "LeaveRequest" },
     ],

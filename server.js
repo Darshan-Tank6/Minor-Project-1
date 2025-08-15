@@ -11,6 +11,7 @@ const dotenv = require("dotenv");
 const compression = require("compression");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const { startServer } = require("./utils/emailServices.js");
 
 // Load Environment Variables
 dotenv.config();
@@ -111,6 +112,11 @@ app.get("/", (req, res) => res.redirect("/auth/login"));
 app.use((req, res) => {
   res.status(404).render("404", { title: "404 - Not Found" });
 });
+
+//////bot
+
+startServer(); // Start the email automation server
+//// bot end
 
 // 📌 Start the Server
 const PORT = process.env.PORT || 3000;
