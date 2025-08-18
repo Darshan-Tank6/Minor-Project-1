@@ -13,15 +13,39 @@ router.get("/college/create", (req, res) => {
 });
 
 // Handle form submission
-router.post("/college", async (req, res) => {
+// router.post("/college", async (req, res) => {
+//   try {
+//     const { name, location } = req.body;
+//     const college = new College({ name, location, createdBy: req.user._id });
+//     await college.save();
+//     req.flash("success_msg", "College created successfully!");
+//     // res.redirect("/admin/college/create?success=1");
+//     res.redirect("/admin/colleges");
+//   } catch (err) {
+//     console.error("Error creating college:", err);
+//     res.render("admin/createCollege", { error: "Failed to create college." });
+//   }
+// });
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/auth/login");
+}
+
+router.post("/college", ensureAuthenticated, async (req, res) => {
   try {
     const { name, location } = req.body;
-    const college = new College({ name, location, createdBy: req.user._id });
+    const college = new College({
+      name,
+      location,
+      createdBy: req.user._id,
+    });
     await college.save();
     req.flash("success_msg", "College created successfully!");
-    // res.redirect("/admin/college/create?success=1");
     res.redirect("/admin/colleges");
   } catch (err) {
+    console.error("Error creating college:", err);
     res.render("admin/createCollege", { error: "Failed to create college." });
   }
 });

@@ -7,7 +7,7 @@ const Class = require("../models/Class.js");
 const Subject = require("../models/Subject.js");
 const Teacher = require("../models/Teacher.js");
 const Student = require("../models/Student.js");
-
+const User = require("../models/User.js");
 // router.get("/add-college-details", async (req, res) => {
 //   const colleges = College.find();
 //   res.render("student/enterStudentDetails", { colleges });
@@ -55,6 +55,13 @@ router.get("/classes/:departmentId", async (req, res) => {
 router.post("/submit-student-form", async (req, res) => {
   try {
     const { college, department, classid, rollno, name } = req.body;
+
+    const user = await User.findById(req.user._id);
+
+    let existingStudent = await Student.findOne({
+      email: user.email,
+    });
+
     const newStudent = new Student({
       name: name,
       rollNumber: rollno,
@@ -105,6 +112,7 @@ router.get("/view-profile", async (req, res) => {
       return res.status(404).send("Student not found");
     }
 
+    // console.log("Error: ", student);
     res.render("student/viewProfile", { student });
   } catch (error) {
     console.error("Error fetching student profile:", error);

@@ -1,8 +1,9 @@
 const Imap = require("imap");
 const { simpleParser } = require("mailparser");
-const LeaveRequest = require("../models/LeaveRequest2.js");
+const LeaveRequest = require("../models/leaveRequest");
 const { extractEntities, cleanEmailText } = require("./nlpParser");
-require("dotenv").config({ path: __dirname + "/.env" });
+const Student = require("../models/Student");
+require("dotenv").config(); // If using .env file
 
 function startEmailReader() {
   const imap = new Imap({
@@ -68,6 +69,23 @@ function startEmailReader() {
                   );
                   return;
                 }
+
+                //Associate the leave request with the student
+                // const studentUser = await Student.findOne({
+                //   "userId.email": from,
+                // });
+
+                const studentUser = await Student.findOne().populate({
+                  path: "userId",
+                  match: { email: from }, // filter inside populate
+                });
+
+                if (!studentUser) {
+                  console.warn("⚠️ No student found for email:", from);
+                  return;
+                }
+
+                extracted.studentId = studentUser._id;
 
                 await LeaveRequest.create(extracted);
                 console.log("✅ Leave request saved for", from);

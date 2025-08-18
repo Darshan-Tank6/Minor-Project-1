@@ -20,6 +20,7 @@ const scheduleSchema = new mongoose.Schema(
         "Thursday",
         "Friday",
         "Saturday",
+        "Sunday",
       ],
     },
     startTime: String,

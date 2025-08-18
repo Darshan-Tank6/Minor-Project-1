@@ -12,6 +12,7 @@ const compression = require("compression");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const { startServer } = require("./utils/emailServices.js");
+const { getAllClassesLeaveSubjectsToday } = require("./utils/getLeaveInfo.js");
 
 // Load Environment Variables
 dotenv.config();
@@ -65,18 +66,26 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-    cookie: {
-      secure: process.env.NODE_ENV === "production", // Set secure flag in production
-      httpOnly: true, // Prevents client-side JS access
-      sameSite: "strict", // Prevent CSRF attacks
-      maxAge: 1000 * 60 * 60, // 1-hour session expiry
-    },
+    // cookie: {
+    //   secure: process.env.NODE_ENV === "production", // Set secure flag in production
+    //   httpOnly: true, // Prevents client-side JS access
+    //   sameSite: "strict", // Prevent CSRF attacks
+    //   maxAge: 1000 * 60 * 60, // 1-hour session expiry
+    // },
+    cookie: { secure: false },
   })
 );
 
 // 📌 Initialize Passport.js
 app.use(passport.initialize());
 app.use(passport.session());
+// ///debugging
+// app.use((req, res, next) => {
+//   console.log("Session:", req.session);
+//   console.log("User in session:", req.user);
+//   next();
+// });
+
 app.use(express.json()); // for JSON POST bodies
 app.use(express.urlencoded({ extended: false })); // for form POST bodies
 
@@ -116,7 +125,17 @@ app.use((req, res) => {
 //////bot
 
 startServer(); // Start the email automation server
+
 //// bot end
+
+///
+
+(async () => {
+  const data = await getAllClassesLeaveSubjectsToday();
+  // console.log(JSON.stringify(data, null, 2));
+})();
+
+///
 
 // 📌 Start the Server
 const PORT = process.env.PORT || 3000;
