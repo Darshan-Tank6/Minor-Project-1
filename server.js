@@ -122,18 +122,18 @@ app.use((req, res) => {
   res.status(404).render("404", { title: "404 - Not Found" });
 });
 
-//////bot
+/// bot
 
-startServer(); // Start the email automation server
+// startServer(); // Start the email automation server
 
-//// bot end
+/// bot end
 
 ///
 
-(async () => {
-  const data = await getAllClassesLeaveSubjectsToday();
-  // console.log(JSON.stringify(data, null, 2));
-})();
+// (async () => {
+//   const data = await getAllClassesLeaveSubjectsToday();
+//   // console.log(JSON.stringify(data, null, 2));
+// })();
 
 ///
 
