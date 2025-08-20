@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen p-6">
+    <!-- Header -->
+    <header class="mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
+      <p class="text-gray-600">Your schedule and subjects at a glance</p>
+    </header>
+
+    <!-- Next Upcoming Lecture -->
+    <% if (nextLecture) { %>
+    <section class="bg-yellow-100 p-4 rounded-2xl shadow mb-8">
+      <h2 class="text-xl font-semibold text-yellow-800 mb-2">Next Lecture</h2>
+      <p class="font-bold text-yellow-900"><%= nextLecture.subject %></p>
+      <p class="text-sm text-gray-700">
+        <%= nextLecture.startTime %> - <%= nextLecture.endTime %>
+      </p>
+      <p class="text-sm text-gray-700">Room: <%= nextLecture.room %></p>
+      <p class="text-sm text-gray-700">Prof: <%= nextLecture.teacher %></p>
+    </section>
+    <% } %>
+
+    <!-- Today's Lectures -->
+    <section class="bg-white p-4 rounded-2xl shadow mb-8">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">
+        Today's Lectures (<%= today %>)
+      </h2>
+      <% if (todaysLectures.length === 0) { %>
+      <p class="text-gray-500">No lectures scheduled for today 🎉</p>
+      <% } else { %>
+      <div class="grid md:grid-cols-2 gap-4">
+        <% todaysLectures.forEach(lec => { %>
+        <div class="p-4 bg-green-100 rounded-xl shadow-sm">
+          <p class="font-semibold text-green-800"><%= lec.subject %></p>
+          <p class="text-sm text-gray-700">
+            <%= lec.startTime %> - <%= lec.endTime %>
+          </p>
+          <p class="text-sm text-gray-700">Room: <%= lec.room %></p>
+          <p class="text-sm text-gray-700">Prof: <%= lec.teacher %></p>
+        </div>
+        <% }) %>
+      </div>
+      <% } %>
+    </section>
+
+    <!-- Calendar Section -->
+    <section class="bg-white p-4 rounded-2xl shadow mb-8">
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Weekly Calendar</h2>
+      <div class="grid grid-cols-7 gap-2 text-center">
+        <% Object.keys(calendar).forEach(day => { %>
+        <div class="bg-gray-50 p-3 rounded-lg shadow-sm min-h-[150px]">
+          <p class="font-medium text-gray-800"><%= day %></p>
+          <% if (calendar[day].length === 0) { %>
+          <p class="text-sm text-gray-500">No Lectures</p>
+          <% } else { %> <% calendar[day].forEach(lec => { %>
+          <div class="mt-2 p-2 bg-blue-100 rounded-lg text-left">
+            <p class="text-sm font-semibold text-blue-700">
+              <%= lec.subject %>
+            </p>
+            <p class="text-xs text-gray-600">
+              <%= lec.startTime %> - <%= lec.endTime %>
+            </p>
+            <p class="text-xs text-gray-600">Room: <%= lec.room %></p>
+            <p class="text-xs text-gray-600">Prof: <%= lec.teacher %></p>
+          </div>
+          <% }) %> <% } %>
+        </div>
+        <% }) %>
+      </div>
+    </section>
+
+    <!-- Subjects Section -->
+    <section>
+      <h2 class="text-xl font-semibold text-gray-700 mb-4">Subjects</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <% subjects.forEach(subject => { %>
+        <div class="bg-white p-5 rounded-2xl shadow hover:shadow-lg transition">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">
+            <%= subject.name %>
+          </h3>
+          <p class="text-sm text-gray-600">
+            Teacher: <%= subject.teachingProfId ? subject.teachingProfId.name :
+            "TBA" %>
+          </p>
+          <% if (subject.schedule && subject.schedule.length > 0) { %>
+          <p class="text-sm text-gray-600">
+            Next Lecture: <%= subject.schedule[0].day %> <%=
+            subject.schedule[0].startTime %>
+          </p>
+          <% } else { %>
+          <p class="text-sm text-gray-600">No lectures scheduled</p>
+          <% } %>
+          <button
+            onclick="location.href='/student/subject/<%= subject._id %>'"
+            class="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            View All
+          </button>
+        </div>
+        <% }) %>
+      </div>
+    </section>
+  </body>
+</html>
