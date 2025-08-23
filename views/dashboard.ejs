@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Dashboard</h1>
+    <p>Welcome, <%= user.email %>!</p>
+
+    <% if (user.role === "student" && student) { %>
+    <p>Your Class: <%= student.classId.name %></p>
+    <h2>Your Subjects:</h2>
+    <ul>
+      <% if (student.classId && student.classId.subjects) { %> <%
+      student.classId.subjects.forEach(function(subject) { %>
+      <li>
+        <%= subject.name %> <% if (subject.teachingProfId) { %> (Prof: <%=
+        subject.teachingProfId.name %> - <%= subject.teachingProfId.email %>) <%
+        } %>
+      </li>
+      <% }); %> <% } else { %>
+      <li>No subjects assigned</li>
+      <% } %>
+    </ul>
+    <% } %> <% if (user.role === "teacher" && teacher) { %>
+    <p>Your Department: <%= teacher.departmentId.name %></p>
+
+    <h2>Your Assigned Subjects:</h2>
+    <ul>
+      <% if (teacher.assignedSubjects && teacher.assignedSubjects.length > 0) {
+      %> <% teacher.assignedSubjects.forEach(function(subject) { %>
+      <li>
+        <%= subject.name %> <% if (subject.teachingProfId) { %> (Prof: <%=
+        subject.teachingProfId.name %> - <%= subject.teachingProfId.email %>) <%
+        } %> <% if (subject.assistantProfId) { %> (Asst. Prof: <%=
+        subject.assistantProfId.name %> - <%= subject.assistantProfId.email %>)
+        <% } %>
+      </li>
+      <% }); %> <% } else { %>
+      <li>No subjects assigned</li>
+      <% } %>
+    </ul>
+    <% } %>
+
+    <a href="/auth/logout">Logout</a>
+  </body>
+</html>

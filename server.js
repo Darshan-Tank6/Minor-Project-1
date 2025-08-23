@@ -27,6 +27,7 @@ const authRoutes = require("./routes/auth");
 const teacherRoutes = require("./routes/teacher");
 const studentRoutes = require("./routes/student");
 const adminRoutes = require("./routes/admin");
+const userRoutes = require("./routes/user");
 
 const app = express();
 
@@ -113,6 +114,7 @@ app.use("/auth", authRoutes);
 app.use("/teacher", teacherRoutes);
 app.use("/student", studentRoutes);
 app.use("/admin", adminRoutes);
+app.use("/user", userRoutes);
 
 // 📌 Home Route
 app.get("/", (req, res) => res.redirect("/auth/login"));
