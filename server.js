@@ -13,6 +13,12 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const { startServer } = require("./utils/emailServices.js");
 const { getAllClassesLeaveSubjectsToday } = require("./utils/getLeaveInfo.js");
+const startScheduler = require("./utils/scheduler.js");
+const {
+  ensureAuthenticated,
+  checkRole,
+  noCache,
+} = require("./middleware/auth.js");
 
 // Load Environment Variables
 dotenv.config();
@@ -110,11 +116,11 @@ app.use((req, res, next) => {
 });
 
 // 📌 Routes
-app.use("/auth", authRoutes);
-app.use("/teacher", teacherRoutes);
-app.use("/student", studentRoutes);
-app.use("/admin", adminRoutes);
-app.use("/user", userRoutes);
+app.use("/auth", noCache, authRoutes);
+app.use("/teacher", ensureAuthenticated, noCache, teacherRoutes);
+app.use("/student", ensureAuthenticated, noCache, studentRoutes);
+app.use("/admin", ensureAuthenticated, noCache, adminRoutes);
+app.use("/user", ensureAuthenticated, noCache, userRoutes);
 
 // 📌 Home Route
 app.get("/", (req, res) => res.redirect("/auth/login"));
@@ -126,17 +132,22 @@ app.use((req, res) => {
 
 /// bot
 
-// startServer(); // Start the email automation server
+startServer(); // Start the email automation server
 
 /// bot end
 
 ///
 
-// (async () => {
-//   const data = await getAllClassesLeaveSubjectsToday();
-//   // console.log(JSON.stringify(data, null, 2));
-// })();
+(async () => {
+  const data = await getAllClassesLeaveSubjectsToday();
+  // console.log(JSON.stringify(data, null, 2));
+})();
 
+///
+
+//scheduler
+
+// startScheduler();
 ///
 
 // 📌 Start the Server

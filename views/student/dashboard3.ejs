@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
   <head>
     <title>Dashboard</title>
@@ -55,7 +55,6 @@
       <div
         class="calendar border rounded-lg bg-white shadow overflow-x-auto relative"
       >
-        <!-- time column -->
         <div class="time-col">
           <% function format12hr(time) { // Handles both "HH:mm" string and
           numeric hour let h, m; if (typeof time === "number") { h = time; m =
@@ -69,7 +68,6 @@
           <% } %>
         </div>
 
-        <!-- day columns -->
         <% weekDays.forEach(day => { const isToday = (day === today); %>
         <div class="day-col <%= isToday ? 'today-col' : '' %>">
           <div
@@ -90,7 +88,6 @@
               <%= format12hr(lec.startTime) %> - <%= format12hr(lec.endTime) %>
             </p>
 
-            <!-- hidden tooltip -->
             <div class="tooltip">
               <p><span class="font-bold">Teacher:</span> <%= lec.teacher %></p>
               <p><span class="font-bold">Room:</span> <%= lec.room %></p>
@@ -128,6 +125,164 @@
           const remPerMin = 1 / 30;
           const top = mins * remPerMin;
 
+          let line = todayCol.querySelector(".time-now-line");
+          if (!line) {
+            line = document.createElement("div");
+            line.className = "time-now-line";
+            todayCol.appendChild(line);
+          }
+          line.style.top = top + "rem";
+        }
+        updateNowLine();
+        setInterval(updateNowLine, 60 * 1000);
+      }
+    </script>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dashboard</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .calendar {
+        display: grid;
+        grid-template-columns: 4rem repeat(7, 1fr);
+      }
+      .calendar .time-col {
+        border-right: 1px solid #ddd;
+      }
+      .calendar .day-col {
+        position: relative;
+        border-left: 1px solid #eee;
+      }
+      .lecture-slot {
+        position: absolute;
+        left: 0.25rem;
+        right: 0.25rem;
+        cursor: pointer;
+      }
+      .today-col {
+        background-color: #fef9c3;
+      }
+      .tooltip {
+        position: absolute;
+        z-index: 10;
+        display: none;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        font-size: 0.75rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      }
+      .time-now-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: red;
+        z-index: 5;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-purple-700 shadow-lg">
+      <div
+        class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between"
+      >
+        <div class="flex items-center space-x-3">
+          <img
+            src="/images/logo.jpg"
+            alt="EduBridge Logo"
+            class="w-10 h-10 object-cover rounded-lg"
+          />
+          <span class="text-white text-xl font-bold">EduBridge</span>
+        </div>
+        <div class="flex space-x-6 text-white font-medium">
+          <a href="/dashboard" class="hover:text-gray-200">Dashboard</a>
+          <a href="/teachers" class="hover:text-gray-200">Teachers</a>
+          <a href="/students" class="hover:text-gray-200">Students</a>
+          <a href="/auth/logout" class="hover:text-gray-200">Logout</a>
+        </div>
+      </div>
+    </nav>
+    <div class="max-w-7xl mx-auto p-6">
+      <h1 class="text-2xl font-bold mb-4">Weekly Calendar</h1>
+      <div
+        class="calendar border rounded-lg bg-white shadow overflow-x-auto relative"
+      >
+        <!-- time column -->
+        <div class="time-col">
+          <% function format12hr(time) { let h, m; if (typeof time === "number")
+          { h = time; m = 0; } else { [h, m] = time.split(":").map(Number); }
+          let suffix = h >= 12 ? "PM" : "AM"; let hour = ((h + 11) % 12 + 1);
+          return hour + (m ? ":" + String(m).padStart(2, "0") : "") + " " +
+          suffix; } %> <% for (let h = 7; h <= 20; h++) { %>
+          <div class="h-12 text-xs text-gray-600 text-right pr-1">
+            <%= format12hr(h) %>
+          </div>
+          <% } %>
+        </div>
+        <!-- day columns -->
+        <% weekDays.forEach(day => { const isToday = (day === today); %>
+        <div class="day-col <%= isToday ? 'today-col' : '' %>">
+          <div
+            class="sticky top-0 bg-gray-100 text-center text-sm font-semibold py-1 border-b"
+          >
+            <%= day %>
+          </div>
+          <% calendar[day].forEach(lec => { %>
+          <div
+            class="lecture-slot bg-blue-200 rounded-lg p-1 text-xs shadow group"
+            data-top="<%= lec.top %>"
+            data-height="<%= lec.height %>"
+          >
+            <p class="font-semibold text-blue-800 truncate">
+              <%= lec.subject %>
+            </p>
+            <p class="text-gray-700">
+              <%= format12hr(lec.startTime) %> - <%= format12hr(lec.endTime) %>
+            </p>
+            <!-- hidden tooltip -->
+            <div class="tooltip">
+              <p><span class="font-bold">Teacher:</span> <%= lec.teacher %></p>
+              <p><span class="font-bold">Room:</span> <%= lec.room %></p>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+    <script>
+      // Apply lecture positions
+      document.querySelectorAll(".lecture-slot").forEach((el) => {
+        el.style.top = el.dataset.top + "rem";
+        el.style.height = el.dataset.height + "rem";
+        const tooltip = el.querySelector(".tooltip");
+        el.addEventListener("mouseenter", () => {
+          tooltip.style.display = "block";
+          tooltip.style.top = "100%";
+          tooltip.style.left = "0";
+        });
+        el.addEventListener("mouseleave", () => {
+          tooltip.style.display = "none";
+        });
+      });
+      // Draw current time line
+      const todayCol = document.querySelector(".today-col");
+      if (todayCol) {
+        function updateNowLine() {
+          const now = new Date();
+          const mins = now.getHours() * 60 + now.getMinutes();
+          const remPerMin = 1 / 30;
+          const top = mins * remPerMin;
           let line = todayCol.querySelector(".time-now-line");
           if (!line) {
             line = document.createElement("div");

@@ -5,16 +5,22 @@ const Department = require("../models/Department.js");
 const Class = require("../models/Class.js");
 const Subject = require("../models/Subject.js");
 const Teacher = require("../models/Teacher.js");
+const { ensureAuthenticated, checkRole } = require("../middleware/auth");
 
 //teacher views
-router.get("/view/classes", async (req, res) => {
-  const teacher = await Teacher.findOne({ userId: req.user._id })
-    .populate("departmentId")
-    .populate("assignedSubjects")
-    .populate("userId");
+router.get(
+  "/view/classes",
+  ensureAuthenticated,
+  checkRole("teacher"),
+  async (req, res) => {
+    const teacher = await Teacher.findOne({ userId: req.user._id })
+      .populate("departmentId")
+      .populate("assignedSubjects")
+      .populate("userId");
 
-  console.log("Teacher: ", teacher);
-  res.render("teacher/viewClasses", { teacher });
-});
+    console.log("Teacher: ", teacher);
+    res.render("teacher/viewClasses", { teacher });
+  }
+);
 
 module.exports = router;

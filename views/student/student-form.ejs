@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
   <head>
     <title>Student Form</title>
@@ -63,6 +63,166 @@
         const deptId = $(this).val();
         $("#class").html('<option value="">Loading...</option>');
 
+        if (deptId) {
+          $.get(`/student/classes/${deptId}`, function (classes) {
+            let options = '<option value="">Select Class</option>';
+            classes.forEach((cls) => {
+              options += `<option value="${cls._id}">${cls.name}</option>`;
+            });
+            $("#class").html(options);
+          });
+        }
+      });
+    </script>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Student Form</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-purple-600 shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo and Brand -->
+          <div class="flex items-center space-x-3">
+            <img
+              src="/images/logo.jpg"
+              alt="EduBridge Logo"
+              class="w-10 h-10 object-cover rounded-lg"
+            />
+            <span class="text-white text-xl font-bold">EduBridge</span>
+          </div>
+          <!-- Links -->
+          <div class="flex space-x-6">
+            <a href="/" class="text-white hover:text-gray-200">Home</a>
+            <a href="/about" class="text-white hover:text-gray-200">About Us</a>
+            <a href="/contact" class="text-white hover:text-gray-200"
+              >Contact</a
+            >
+            <a href="/auth/auth/logout" class="hover:text-gray-300">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <!-- Main Container -->
+    <div class="max-w-3xl mx-auto bg-white mt-10 p-8 rounded-2xl shadow-xl">
+      <h2 class="text-2xl font-bold text-purple-700 mb-6 text-center">
+        Select College, Department, and Class
+      </h2>
+      <p class="text-gray-600 mb-6 text-center">Welcome <%= user.email %></p>
+      <form
+        action="/student/submit-student-form"
+        method="POST"
+        class="space-y-6"
+      >
+        <!-- College -->
+        <div>
+          <label for="college" class="block text-gray-700 font-semibold mb-2"
+            >College:</label
+          >
+          <select
+            id="college"
+            name="college"
+            required
+            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+          >
+            <option value="">Select College</option>
+            <% colleges.forEach(college => { %>
+            <option value="<%= college._id %>"><%= college.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <!-- Department -->
+        <div>
+          <label for="department" class="block text-gray-700 font-semibold mb-2"
+            >Department:</label
+          >
+          <select
+            id="department"
+            name="department"
+            required
+            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+          >
+            <option value="">Select Department</option>
+          </select>
+        </div>
+        <!-- Class -->
+        <div>
+          <label for="class" class="block text-gray-700 font-semibold mb-2"
+            >Class:</label
+          >
+          <select
+            id="class"
+            name="classid"
+            required
+            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+          >
+            <option value="">Select Class</option>
+          </select>
+        </div>
+        <!-- Name -->
+        <div>
+          <label for="name" class="block text-gray-700 font-semibold mb-2"
+            >Name:</label
+          >
+          <input
+            type="text"
+            name="name"
+            required
+            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+          />
+        </div>
+        <!-- Roll Number -->
+        <div>
+          <label for="rollno" class="block text-gray-700 font-semibold mb-2"
+            >Roll No:</label
+          >
+          <input
+            type="number"
+            name="rollno"
+            required
+            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500"
+          />
+        </div>
+        <!-- Submit Button -->
+        <div class="text-center">
+          <button
+            type="submit"
+            class="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+    <!-- Scripts -->
+    <script>
+      $("#college").on("change", function () {
+        const collegeId = $(this).val();
+        $("#department").html('<option value="">Loading...</option>');
+        $("#class").html('<option value="">Select Class</option>');
+        if (collegeId) {
+          $.get(`/student/departments/${collegeId}`, function (departments) {
+            let options = '<option value="">Select Department</option>';
+            departments.forEach((dep) => {
+              options += `<option value="${dep._id}">${dep.name}</option>`;
+            });
+            $("#department").html(options);
+          });
+        }
+      });
+      $("#department").on("change", function () {
+        const deptId = $(this).val();
+        $("#class").html('<option value="">Loading...</option>');
         if (deptId) {
           $.get(`/student/classes/${deptId}`, function (classes) {
             let options = '<option value="">Select Class</option>';

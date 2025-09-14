@@ -6,6 +6,7 @@ const User = require("../models/User");
 const Teacher = require("../models/Teacher");
 const Student = require("../models/Student");
 require("dotenv").config();
+const { encrypt } = require("../utils/cryptoVault");
 
 // ----------------------
 // Local Strategy
@@ -37,6 +38,13 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL || "/auth/google/callback", // use env in production
       passReqToCallback: true,
+      scope: [
+        "profile",
+        "email",
+        "https://www.googleapis.com/auth/calendar.events",
+      ],
+      accessType: "offline", // 🔑 get refresh token
+      prompt: "consent", // 🔑 force consent every login
     },
     async (req, accessToken, refreshToken, profile, done) => {
       try {
@@ -51,16 +59,33 @@ passport.use(
           let teacherDoc = null;
 
           if (adminEmails.includes(email)) {
-            console.log("Admin user detected:", email);
+            // console.log("Admin user detected:", email);
             role = "admin";
           } else {
             teacherDoc = await Teacher.findOne({ email });
             if (teacherDoc) {
               role = "teacher";
-              console.log("teacher user detected:", teacherDoc);
+              teacherDoc.userId = user?._id;
+              await teacherDoc.save();
+              // console.log("teacher user detected:", teacherDoc);
             } else {
-              console.log("teacher user not detected");
+              // console.log("teacher user not detected");
             }
+          }
+
+          // const enc = encrypt(refreshToken);
+          // userRefreshTokenEnc = enc.ciphertext;
+          // userRefreshTokenIv = JSON.stringify({
+          //   iv: enc.iv,
+          //   tag: enc.tag,
+          // });
+
+          let userRefreshTokenEnc = null;
+          let userRefreshTokenIv = null;
+          if (refreshToken) {
+            const enc = encrypt(refreshToken);
+            userRefreshTokenEnc = enc.ciphertext;
+            userRefreshTokenIv = JSON.stringify({ iv: enc.iv, tag: enc.tag });
           }
 
           // Create new user
@@ -69,16 +94,18 @@ passport.use(
             role,
             google: {
               id: profile.id,
-              refreshToken: refreshToken, // only first time
+              // refreshToken: refreshToken, // only first time
+              refreshTokenEnc: userRefreshTokenEnc,
+              refreshTokenIv: userRefreshTokenIv,
             },
           });
           await user.save();
 
-          // Link teacher or student record
-          if (role === "teacher" && teacherDoc) {
-            teacherDoc.userId = user._id;
-            await teacherDoc.save();
-          }
+          // // Link teacher or student record
+          // if (role === "teacher" && teacherDoc) {
+          //   teacherDoc.userId = user._id;
+          //   await teacherDoc.save();
+          // }
           // else if (role === "student") {
           //   await new Student({
           //     userId: user._id,
@@ -87,8 +114,17 @@ passport.use(
           // }
         } else {
           // Update refresh token only if provided
+          // if (refreshToken) {
+          //   user.google.refreshToken = refreshToken;
+          //   await user.save();
+          // }
           if (refreshToken) {
-            user.google.refreshToken = refreshToken;
+            const enc = encrypt(refreshToken);
+            user.google.refreshTokenEnc = enc.ciphertext;
+            user.google.refreshTokenIv = JSON.stringify({
+              iv: enc.iv,
+              tag: enc.tag,
+            });
             await user.save();
           }
         }

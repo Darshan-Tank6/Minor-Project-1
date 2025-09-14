@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
   <head>
     <title>Classes in <%= department.name %></title>
@@ -41,6 +41,84 @@
         class="inline-block mt-6 text-gray-600 hover:underline"
         >← Back to Departments</a
       >
+    </div>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Classes in <%= department.name %></title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-white min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-purple-800 text-white shadow-lg">
+      <div
+        class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16"
+      >
+        <div class="flex items-center space-x-3">
+          <img
+            src="/images/logo.jpg"
+            alt="EduBridge Logo"
+            class="w-10 h-10 object-cover rounded-lg"
+          />
+          <span class="text-xl font-bold">EduBridge</span>
+        </div>
+        <div class="space-x-6">
+          <a href="/" class="hover:text-gray-300">Home</a>
+          <a href="/about" class="hover:text-gray-300">About</a>
+          <a href="/contact" class="hover:text-gray-300">Contact</a>
+          <a href="/auth/auth/logout" class="hover:text-gray-300">Logout</a>
+        </div>
+      </div>
+    </nav>
+    <!-- Main Content -->
+    <div class="flex justify-center items-center py-10 px-4">
+      <div
+        class="max-w-4xl w-full bg-white p-6 rounded-2xl shadow-lg border border-gray-200"
+      >
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">
+          Classes in
+          <span class="text-purple-700"><%= department.name %></span>
+          (<span class="text-purple-700"><%= department.collegeId.name %></span
+          >)
+        </h2>
+        <% if (classes.length === 0) { %>
+        <p class="text-gray-600">No classes found.</p>
+        <% } else { %>
+        <ul class="space-y-4">
+          <% classes.forEach(cls => { %>
+          <li class="border p-4 rounded-lg shadow-sm bg-gray-50">
+            <h3 class="text-lg font-semibold"><%= cls.name %></h3>
+            <p class="text-sm text-gray-600">Year: <%= cls.year %></p>
+            <a
+              href="/admin/class/<%= cls._id %>/subject/create"
+              class="text-purple-700 hover:underline mr-4"
+            >
+              + Add Subject
+            </a>
+            <a
+              href="/admin/subjects/under/class/<%= cls._id %>"
+              class="text-purple-700 hover:underline"
+            >
+              View Subjects
+            </a>
+          </li>
+          <% }); %>
+        </ul>
+        <% } %>
+        <a
+          href="/admin/college/<%= department.collegeId._id %>/departments"
+          class="inline-block mt-6 text-purple-700 hover:underline"
+        >
+          ← Back to Departments
+        </a>
+      </div>
     </div>
   </body>
 </html>

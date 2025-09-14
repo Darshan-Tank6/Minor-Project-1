@@ -18,6 +18,15 @@ const bcrypt = require("bcryptjs");
 //   { timestamps: true }
 // );
 
+const RefreshTokenSchema = new mongoose.Schema({
+  id: { type: String, index: true, required: true }, // UUID
+  hash: { type: String, required: true }, // argon2 hash of secret
+  createdAt: { type: Date, default: Date.now },
+  lastUsedAt: { type: Date },
+  userAgent: String,
+  ip: String,
+});
+
 const userSchema = new mongoose.Schema(
   {
     email: { type: String, unique: true, required: true },
@@ -34,8 +43,12 @@ const userSchema = new mongoose.Schema(
     // Google login details
     google: {
       id: { type: String }, // profile.id
-      refreshToken: { type: String },
+      // refreshToken: { type: String },
+      // Google refresh token encrypted at rest (only if you call Google APIs)
+      refreshTokenEnc: String,
+      refreshTokenIv: String, // JSON string: {iv, tag}
     },
+    refreshTokens: [RefreshTokenSchema], // our app refresh tokens
 
     // Optionally link to Teacher/Student collections
     // linkedId: mongoose.Schema.Types.ObjectId,

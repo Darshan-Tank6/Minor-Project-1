@@ -114,7 +114,7 @@ async function getAllClassesLeaveSubjectsToday() {
             // );
             await createOrUpdateCalendarEvent(
               result,
-              user.google.refreshToken,
+              // user.google.refreshToken,
               leave.studentId.email
             );
           } else {

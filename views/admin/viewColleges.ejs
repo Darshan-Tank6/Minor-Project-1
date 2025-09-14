@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
   <head>
     <title>All Colleges</title>
@@ -39,6 +39,81 @@
         <% }); %>
       </ul>
       <% } %>
+    </div>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>All Colleges</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-white min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-purple-800 text-white shadow-lg">
+      <div
+        class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16"
+      >
+        <div class="flex items-center space-x-3">
+          <img
+            src="/images/logo.jpg"
+            alt="EduBridge Logo"
+            class="w-10 h-10 object-cover rounded-lg"
+          />
+          <span class="text-xl font-bold">EduBridge</span>
+        </div>
+        <div class="space-x-6">
+          <a href="/" class="hover:text-gray-300">Home</a>
+          <a href="/about" class="hover:text-gray-300">About</a>
+          <a href="/contact" class="hover:text-gray-300">Contact</a>
+          <a href="/auth/auth/logout" class="hover:text-gray-300">Logout</a>
+        </div>
+      </div>
+    </nav>
+    <!-- Main Content -->
+    <div class="flex justify-center items-center py-10 px-4">
+      <div
+        class="max-w-4xl w-full bg-white p-6 rounded-2xl shadow-lg border border-gray-200"
+      >
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Colleges</h2>
+        <a
+          href="/admin/college/create"
+          class="inline-block mb-4 bg-purple-700 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-800 transition"
+        >
+          + Add College
+        </a>
+        <% if (colleges.length === 0) { %>
+        <p>No colleges found.</p>
+        <% } else { %>
+        <ul class="space-y-4">
+          <% colleges.forEach(college => { %>
+          <li class="border p-4 rounded-lg shadow-sm bg-gray-50">
+            <h3 class="text-lg font-semibold"><%= college.name %></h3>
+            <p class="text-sm text-gray-600">
+              Location: <%= college.location %>
+            </p>
+            <a
+              href="/admin/department/create/<%= college._id %>"
+              class="mt-2 inline-block text-purple-700 hover:underline"
+            >
+              + Add Department
+            </a>
+            <a
+              href="/admin/college/<%= college._id %>/departments"
+              class="ml-4 text-purple-700 hover:underline"
+            >
+              View Departments
+            </a>
+          </li>
+          <% }) %>
+        </ul>
+        <% } %>
+      </div>
     </div>
   </body>
 </html>

@@ -8,117 +8,153 @@ const Subject = require("../models/Subject.js");
 const Teacher = require("../models/Teacher.js");
 const Student = require("../models/Student.js");
 const User = require("../models/User.js");
+const { ensureAuthenticated, checkRole } = require("../middleware/auth");
 // router.get("/add-college-details", async (req, res) => {
 //   const colleges = College.find();
 //   res.render("student/enterStudentDetails", { colleges });
 // });
 
-router.get("/add-college-details", async (req, res) => {
-  try {
+router.get(
+  "/add-college-details",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    try {
+      const colleges = await College.find();
+      const departments = await Department.find().populate("collegeId");
+      const classes = await Class.find().populate("departmentId");
+      // console.log(colleges);
+      res.render("student/enterStudentDetails", {
+        colleges,
+        departments,
+        classes,
+      });
+    } catch (err) {
+      console.error("Error fetching colleges:", err);
+      res.status(500).send("Error fetching colleges");
+    }
+  }
+);
+
+router.get(
+  "/student-form",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
     const colleges = await College.find();
-    const departments = await Department.find().populate("collegeId");
-    const classes = await Class.find().populate("departmentId");
-    // console.log(colleges);
-    res.render("student/enterStudentDetails", {
-      colleges,
-      departments,
-      classes,
-    });
-  } catch (err) {
-    console.error("Error fetching colleges:", err);
-    res.status(500).send("Error fetching colleges");
+    res.render("student/student-form", { colleges });
   }
-});
+);
 
-router.get("/student-form", async (req, res) => {
-  const colleges = await College.find();
-  res.render("student/student-form", { colleges });
-});
-
-router.get("/get-colleges", async (req, res) => {
-  const colleges = await College.find();
-  res.render("student/enterStudentDeails", { colleges });
-});
-
-router.get("/departments/:collegeId", async (req, res) => {
-  const departments = await Department.find({
-    collegeId: req.params.collegeId,
-  });
-  res.json(departments);
-});
-
-router.get("/classes/:departmentId", async (req, res) => {
-  const classes = await Class.find({ departmentId: req.params.departmentId });
-  res.json(classes);
-});
-
-router.post("/submit-student-form", async (req, res) => {
-  try {
-    const { college, department, classid, rollno, name } = req.body;
-
-    const user = await User.findById(req.user._id);
-
-    let existingStudent = await Student.findOne({
-      email: user.email,
-    });
-
-    const newStudent = new Student({
-      name: name,
-      rollNumber: rollno,
-      email: req.user.email,
-      classId: classid,
-      departmentId: department,
-      year: classid.year,
-      userId: req.user._id,
-    });
-    await newStudent.save();
-    res.redirect("/student/student-form");
-    // res.send(req.body); // for testing
-  } catch (error) {
-    console.log("Error: ", error);
-    res.redirect("/student/student-form");
+router.get(
+  "/get-colleges",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    const colleges = await College.find();
+    res.render("student/enterStudentDeails", { colleges });
   }
-});
+);
 
-// View Profile
-router.get("/view-profile", async (req, res) => {
-  try {
-    const student = await Student.findOne({ userId: req.user._id })
-      .populate("classId")
-      .populate("departmentId")
-      .populate("userId")
-      .populate({
-        path: "classId",
-        populate: {
-          path: "subjects",
-          populate: [
-            {
-              path: "teachingProfId",
-              select: "name email",
-              strictPopulate: false,
-            },
-            {
-              path: "assistantProfId",
-              select: "name email",
-              strictPopulate: false,
-            },
-          ],
-        },
+router.get(
+  "/departments/:collegeId",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    const departments = await Department.find({
+      collegeId: req.params.collegeId,
+    });
+    res.json(departments);
+  }
+);
+
+router.get(
+  "/classes/:departmentId",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    const classes = await Class.find({ departmentId: req.params.departmentId });
+    res.json(classes);
+  }
+);
+
+router.post(
+  "/submit-student-form",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    try {
+      const { college, department, classid, rollno, name } = req.body;
+
+      const user = await User.findById(req.user._id);
+
+      let existingStudent = await Student.findOne({
+        email: user.email,
       });
 
-    // .populate("collegeId");
-
-    if (!student) {
-      return res.status(404).send("Student not found");
+      const newStudent = new Student({
+        name: name,
+        rollNumber: rollno,
+        email: req.user.email,
+        classId: classid,
+        departmentId: department,
+        year: classid.year,
+        userId: req.user._id,
+      });
+      await newStudent.save();
+      res.redirect("/student/student-form");
+      // res.send(req.body); // for testing
+    } catch (error) {
+      console.log("Error: ", error);
+      res.redirect("/student/student-form");
     }
-
-    // console.log("Error: ", student);
-    res.render("student/viewProfile", { student });
-  } catch (error) {
-    console.error("Error fetching student profile:", error);
-    res.status(500).send("Error fetching student profile");
   }
-});
+);
+
+// View Profile
+router.get(
+  "/view-profile",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    try {
+      const student = await Student.findOne({ userId: req.user._id })
+        .populate("classId")
+        .populate("departmentId")
+        .populate("userId")
+        .populate({
+          path: "classId",
+          populate: {
+            path: "subjects",
+            populate: [
+              {
+                path: "teachingProfId",
+                select: "name email",
+                strictPopulate: false,
+              },
+              {
+                path: "assistantProfId",
+                select: "name email",
+                strictPopulate: false,
+              },
+            ],
+          },
+        });
+
+      // .populate("collegeId");
+
+      if (!student) {
+        return res.status(404).send("Student not found");
+      }
+
+      // console.log("Error: ", student);
+      res.render("student/viewProfile", { student });
+    } catch (error) {
+      console.error("Error fetching student profile:", error);
+      res.status(500).send("Error fetching student profile");
+    }
+  }
+);
 
 //////////////////////
 
@@ -141,75 +177,82 @@ function computeLecturePosition(start, end) {
   return { top, height };
 }
 
-router.get("/dashboard", async (req, res) => {
-  try {
-    const student = await Student.findOne({ userId: req.user._id }).populate({
-      path: "classId",
-      populate: {
-        path: "subjects",
+router.get(
+  "/dashboard",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    try {
+      const student = await Student.findOne({ userId: req.user._id }).populate({
+        path: "classId",
         populate: {
-          path: "teachingProfId",
-          select: "name email",
+          path: "subjects",
+          populate: {
+            path: "teachingProfId",
+            select: "name email",
+          },
         },
-      },
-    });
+      });
 
-    if (!student || !student.classId) {
-      return res.status(404).send("Class not found for student");
-    }
+      if (!student || !student.classId) {
+        return res.status(404).send("Class not found for student");
+      }
 
-    const subjects = student.classId.subjects;
-    const weekDays = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    const calendar = {};
-    weekDays.forEach((day) => {
-      calendar[day] = [];
-    });
+      const subjects = student.classId.subjects;
+      const weekDays = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const calendar = {};
+      weekDays.forEach((day) => {
+        calendar[day] = [];
+      });
 
-    subjects.forEach((subject) => {
-      subject.schedule?.forEach((lec) => {
-        const pos = computeLecturePosition(lec.startTime, lec.endTime);
-        calendar[lec.day].push({
-          subject: subject.name,
-          teacher: subject.teachingProfId ? subject.teachingProfId.name : "TBA",
-          startTime: lec.startTime,
-          endTime: lec.endTime,
-          room: lec.room,
-          top: pos.top,
-          height: pos.height,
+      subjects.forEach((subject) => {
+        subject.schedule?.forEach((lec) => {
+          const pos = computeLecturePosition(lec.startTime, lec.endTime);
+          calendar[lec.day].push({
+            subject: subject.name,
+            teacher: subject.teachingProfId
+              ? subject.teachingProfId.name
+              : "TBA",
+            startTime: lec.startTime,
+            endTime: lec.endTime,
+            room: lec.room,
+            top: pos.top,
+            height: pos.height,
+          });
         });
       });
-    });
 
-    // sort lectures in each day
-    weekDays.forEach((day) => {
-      calendar[day].sort(
-        (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
-      );
-    });
+      // sort lectures in each day
+      weekDays.forEach((day) => {
+        calendar[day].sort(
+          (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
+        );
+      });
 
-    const today = weekDays[new Date().getDay()];
-    const todaysLectures = calendar[today] || [];
+      const today = weekDays[new Date().getDay()];
+      const todaysLectures = calendar[today] || [];
 
-    res.render("student/dashboard2", {
-      calendar,
-      subjects,
-      todaysLectures,
-      today,
-      weekDays,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error loading dashboard");
+      res.render("student/dashboard2", {
+        calendar,
+        subjects,
+        todaysLectures,
+        today,
+        weekDays,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error loading dashboard");
+    }
   }
-});
+);
 
 /////////////////////
 
@@ -224,93 +267,98 @@ function sortByTime(lectures) {
   );
 }
 
-router.get("/dashboard4", async (req, res) => {
-  try {
-    const student = await Student.findOne({ userId: req.user._id }).populate({
-      path: "classId",
-      populate: {
-        path: "subjects",
+router.get(
+  "/dashboard4",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    try {
+      const student = await Student.findOne({ userId: req.user._id }).populate({
+        path: "classId",
         populate: {
-          path: "teachingProfId",
-          select: "name email",
+          path: "subjects",
+          populate: {
+            path: "teachingProfId",
+            select: "name email",
+          },
         },
-      },
-    });
+      });
 
-    if (!student || !student.classId) {
-      return res.status(404).send("Class not found for student");
-    }
-
-    const subjects = student.classId.subjects;
-    const weekDays = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    const calendar = {};
-    weekDays.forEach((day) => {
-      calendar[day] = [];
-    });
-
-    let allLectures = [];
-
-    subjects.forEach((subject) => {
-      if (subject.schedule && subject.schedule.length > 0) {
-        subject.schedule.forEach((lec) => {
-          const lectureData = {
-            subject: subject.name,
-            subjectId: subject._id,
-            teacher: subject.teachingProfId
-              ? subject.teachingProfId.name
-              : "TBA",
-            day: lec.day,
-            startTime: lec.startTime,
-            endTime: lec.endTime,
-            room: lec.room,
-          };
-          calendar[lec.day].push(lectureData);
-          allLectures.push(lectureData);
-        });
+      if (!student || !student.classId) {
+        return res.status(404).send("Class not found for student");
       }
-    });
 
-    // Sort each day’s lectures
-    weekDays.forEach((day) => {
-      calendar[day] = sortByTime(calendar[day]);
-    });
+      const subjects = student.classId.subjects;
+      const weekDays = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const calendar = {};
+      weekDays.forEach((day) => {
+        calendar[day] = [];
+      });
 
-    // Today’s lectures
-    const today = weekDays[new Date().getDay()];
-    const todaysLectures = calendar[today] || [];
+      let allLectures = [];
 
-    // Next upcoming lecture (compare to current time)
-    const nowMinutes = timeToMinutes(
-      new Date().getHours() + ":" + new Date().getMinutes()
-    );
-    let nextLecture = null;
+      subjects.forEach((subject) => {
+        if (subject.schedule && subject.schedule.length > 0) {
+          subject.schedule.forEach((lec) => {
+            const lectureData = {
+              subject: subject.name,
+              subjectId: subject._id,
+              teacher: subject.teachingProfId
+                ? subject.teachingProfId.name
+                : "TBA",
+              day: lec.day,
+              startTime: lec.startTime,
+              endTime: lec.endTime,
+              room: lec.room,
+            };
+            calendar[lec.day].push(lectureData);
+            allLectures.push(lectureData);
+          });
+        }
+      });
 
-    if (todaysLectures.length > 0) {
-      nextLecture = todaysLectures.find(
-        (lec) => timeToMinutes(lec.startTime) > nowMinutes
+      // Sort each day’s lectures
+      weekDays.forEach((day) => {
+        calendar[day] = sortByTime(calendar[day]);
+      });
+
+      // Today’s lectures
+      const today = weekDays[new Date().getDay()];
+      const todaysLectures = calendar[today] || [];
+
+      // Next upcoming lecture (compare to current time)
+      const nowMinutes = timeToMinutes(
+        new Date().getHours() + ":" + new Date().getMinutes()
       );
-    }
+      let nextLecture = null;
 
-    res.render("student/dashboard", {
-      calendar,
-      subjects,
-      todaysLectures,
-      today,
-      nextLecture,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error loading dashboard");
+      if (todaysLectures.length > 0) {
+        nextLecture = todaysLectures.find(
+          (lec) => timeToMinutes(lec.startTime) > nowMinutes
+        );
+      }
+
+      res.render("student/dashboard", {
+        calendar,
+        subjects,
+        todaysLectures,
+        today,
+        nextLecture,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error loading dashboard");
+    }
   }
-});
+);
 
 function sortByTime(lectures) {
   return lectures.sort((a, b) => {
@@ -320,189 +368,204 @@ function sortByTime(lectures) {
   });
 }
 
-router.get("/dashboard2", async (req, res) => {
-  try {
-    const student = await Student.findOne({ userId: req.user._id }).populate({
-      path: "classId",
-      populate: {
-        path: "subjects",
+router.get(
+  "/dashboard2",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    try {
+      const student = await Student.findOne({ userId: req.user._id }).populate({
+        path: "classId",
         populate: {
-          path: "teachingProfId",
-          select: "name email",
+          path: "subjects",
+          populate: {
+            path: "teachingProfId",
+            select: "name email",
+          },
         },
-      },
-    });
+      });
 
-    if (!student || !student.classId) {
-      return res.status(404).send("Class not found for student");
-    }
-
-    const subjects = student.classId.subjects;
-    const weekDays = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    const calendar = {};
-    weekDays.forEach((day) => {
-      calendar[day] = [];
-    });
-
-    subjects.forEach((subject) => {
-      if (subject.schedule && subject.schedule.length > 0) {
-        subject.schedule.forEach((lec) => {
-          calendar[lec.day].push({
-            subject: subject.name,
-            subjectId: subject._id,
-            teacher: subject.teachingProfId
-              ? subject.teachingProfId.name
-              : "TBA",
-            startTime: lec.startTime,
-            endTime: lec.endTime,
-            room: lec.room,
-          });
-        });
+      if (!student || !student.classId) {
+        return res.status(404).send("Class not found for student");
       }
-    });
 
-    // Sort each day’s lectures by time
-    weekDays.forEach((day) => {
-      calendar[day] = sortByTime(calendar[day]);
-    });
+      const subjects = student.classId.subjects;
+      const weekDays = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const calendar = {};
+      weekDays.forEach((day) => {
+        calendar[day] = [];
+      });
 
-    // Today’s lectures
-    const today = weekDays[new Date().getDay()];
-    const todaysLectures = calendar[today] || [];
+      subjects.forEach((subject) => {
+        if (subject.schedule && subject.schedule.length > 0) {
+          subject.schedule.forEach((lec) => {
+            calendar[lec.day].push({
+              subject: subject.name,
+              subjectId: subject._id,
+              teacher: subject.teachingProfId
+                ? subject.teachingProfId.name
+                : "TBA",
+              startTime: lec.startTime,
+              endTime: lec.endTime,
+              room: lec.room,
+            });
+          });
+        }
+      });
 
-    res.render("student/dashboard", {
-      calendar,
-      subjects,
-      todaysLectures,
-      today,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error loading dashboard");
+      // Sort each day’s lectures by time
+      weekDays.forEach((day) => {
+        calendar[day] = sortByTime(calendar[day]);
+      });
+
+      // Today’s lectures
+      const today = weekDays[new Date().getDay()];
+      const todaysLectures = calendar[today] || [];
+
+      res.render("student/dashboard", {
+        calendar,
+        subjects,
+        todaysLectures,
+        today,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error loading dashboard");
+    }
   }
-});
+);
 
 // View All lectures for one subject
-router.get("/subject/:id", async (req, res) => {
-  try {
-    const subjectId = req.params.id;
+router.get(
+  "/subject/:id",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    try {
+      const subjectId = req.params.id;
 
-    const student = await Student.findOne({ userId: req.user._id }).populate({
-      path: "classId",
-      populate: {
-        path: "subjects",
+      const student = await Student.findOne({ userId: req.user._id }).populate({
+        path: "classId",
         populate: {
-          path: "teachingProfId",
-          select: "name email",
+          path: "subjects",
+          populate: {
+            path: "teachingProfId",
+            select: "name email",
+          },
         },
-      },
-    });
+      });
 
-    if (!student || !student.classId) {
-      return res.status(404).send("Class not found for student");
+      if (!student || !student.classId) {
+        return res.status(404).send("Class not found for student");
+      }
+
+      const subject = student.classId.subjects.find(
+        (sub) => sub._id.toString() === subjectId
+      );
+
+      if (!subject) {
+        return res.status(404).send("Subject not found");
+      }
+
+      // Sort schedule
+      const lectures = sortByTime(
+        subject.schedule.map((lec) => ({
+          day: lec.day,
+          startTime: lec.startTime,
+          endTime: lec.endTime,
+          room: lec.room,
+          teacher: subject.teachingProfId ? subject.teachingProfId.name : "TBA",
+        }))
+      );
+
+      res.render("student/viewSubject", { subject, lectures });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error loading subject details");
     }
-
-    const subject = student.classId.subjects.find(
-      (sub) => sub._id.toString() === subjectId
-    );
-
-    if (!subject) {
-      return res.status(404).send("Subject not found");
-    }
-
-    // Sort schedule
-    const lectures = sortByTime(
-      subject.schedule.map((lec) => ({
-        day: lec.day,
-        startTime: lec.startTime,
-        endTime: lec.endTime,
-        room: lec.room,
-        teacher: subject.teachingProfId ? subject.teachingProfId.name : "TBA",
-      }))
-    );
-
-    res.render("student/viewSubject", { subject, lectures });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error loading subject details");
   }
-});
+);
 
 ///////////////////////////////
 
-router.get("/dashboard1", async (req, res) => {
-  try {
-    // Find logged-in student with class and subjects populated
-    const student = await Student.findOne({ userId: req.user._id }).populate({
-      path: "classId",
-      populate: {
-        path: "subjects",
+router.get(
+  "/dashboard1",
+  ensureAuthenticated,
+  checkRole("student"),
+  async (req, res) => {
+    try {
+      // Find logged-in student with class and subjects populated
+      const student = await Student.findOne({ userId: req.user._id }).populate({
+        path: "classId",
         populate: {
-          path: "teachingProfId", // populate teacher info
-          select: "name email",
+          path: "subjects",
+          populate: {
+            path: "teachingProfId", // populate teacher info
+            select: "name email",
+          },
         },
-      },
-    });
+      });
 
-    if (!student || !student.classId) {
-      return res.status(404).send("Class not found for student");
-    }
-
-    const subjects = student.classId.subjects;
-
-    // Build weekly calendar
-    const weekDays = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    const calendar = {};
-    weekDays.forEach((day) => {
-      calendar[day] = [];
-    });
-
-    subjects.forEach((subject) => {
-      if (subject.schedule && subject.schedule.length > 0) {
-        subject.schedule.forEach((lec) => {
-          calendar[lec.day].push({
-            subject: subject.name,
-            teacher: subject.teachingProfId
-              ? subject.teachingProfId.name
-              : "TBA",
-            startTime: lec.startTime,
-            endTime: lec.endTime,
-            room: lec.room,
-          });
-        });
+      if (!student || !student.classId) {
+        return res.status(404).send("Class not found for student");
       }
-    });
 
-    // Today's lectures
-    const today = weekDays[new Date().getDay()];
-    const todaysLectures = calendar[today] || [];
+      const subjects = student.classId.subjects;
 
-    res.render("student/dashboard", {
-      calendar,
-      subjects,
-      todaysLectures,
-      today,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error loading dashboard");
+      // Build weekly calendar
+      const weekDays = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      const calendar = {};
+      weekDays.forEach((day) => {
+        calendar[day] = [];
+      });
+
+      subjects.forEach((subject) => {
+        if (subject.schedule && subject.schedule.length > 0) {
+          subject.schedule.forEach((lec) => {
+            calendar[lec.day].push({
+              subject: subject.name,
+              teacher: subject.teachingProfId
+                ? subject.teachingProfId.name
+                : "TBA",
+              startTime: lec.startTime,
+              endTime: lec.endTime,
+              room: lec.room,
+            });
+          });
+        }
+      });
+
+      // Today's lectures
+      const today = weekDays[new Date().getDay()];
+      const todaysLectures = calendar[today] || [];
+
+      res.render("student/dashboard", {
+        calendar,
+        subjects,
+        todaysLectures,
+        today,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Error loading dashboard");
+    }
   }
-});
+);
 
 module.exports = router;
