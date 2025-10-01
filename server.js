@@ -13,6 +13,9 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const { startServer } = require("./utils/emailServices.js");
 const { getAllClassesLeaveSubjectsToday } = require("./utils/getLeaveInfo.js");
+const {
+  getAllClassesLeaveSubjectsTodayNew,
+} = require("./utils/leaveSubjectsService.js");
 const startScheduler = require("./utils/scheduler.js");
 const {
   ensureAuthenticated,
@@ -34,6 +37,9 @@ const teacherRoutes = require("./routes/teacher");
 const studentRoutes = require("./routes/student");
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
+const {
+  getAllClassesLeaveSubjectsTodayNew,
+} = require("./utils/leaveSubjectsService.js");
 
 const app = express();
 
@@ -138,8 +144,13 @@ startServer(); // Start the email automation server
 
 ///
 
+// (async () => {
+//   const data = await getAllClassesLeaveSubjectsToday();
+//   // console.log(JSON.stringify(data, null, 2));
+// })();
+
 (async () => {
-  const data = await getAllClassesLeaveSubjectsToday();
+  const data = await getAllClassesLeaveSubjectsTodayNew();
   // console.log(JSON.stringify(data, null, 2));
 })();
 
