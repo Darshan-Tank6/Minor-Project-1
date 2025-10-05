@@ -232,7 +232,7 @@ Using **Nodemailer**, automatic emails are sent for:
 
 ---
 
-## 🖼️ Screenshots (Add yours here)
+<!-- ## 🖼️ Screenshots (Add yours here)
 
 | Login Page                           | Dashboard                                    | Leave Form                               |
 | ------------------------------------ | -------------------------------------------- | ---------------------------------------- |
@@ -240,7 +240,7 @@ Using **Nodemailer**, automatic emails are sent for:
 
 > _(You can replace these image paths once you add screenshots to the `docs/screenshots/` folder.)_
 
----
+--- -->
 
 ## 🤝 Contributing
 
